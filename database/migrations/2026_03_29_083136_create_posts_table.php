@@ -19,7 +19,7 @@ return new class extends Migration
             $table->longText('body');
 
             $table->boolean('is_published')->default(false);
-            $table->dateTime('published_at')->nullable;
+            $table->dateTime('published_at')->nullable();
 
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
 
