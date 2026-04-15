@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Laravel 12 Блог с нуля')</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style type="text/tailwindcss">
         @theme {
         --color-accent-gradient: linear-gradient(135deg, #22d3ee, #a78bfa, #f472b6);
@@ -53,7 +53,7 @@
                         <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
                 </button>
-                <a href="#" class="flex items-center gap-2">
+                <a href="{{ route('admin.posts.index') }}" class="flex items-center gap-2">
                     <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl accent text-gray-900 font-black">A</span>
                     <span class="font-semibold tracking-wide">Admin</span>
                 </a>
@@ -67,7 +67,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 md:grid-cols-12 gap-6">
         <aside id="aside" class="md:col-span-3 lg:col-span-2 glass rounded-2xl p-3 border border-white/10 md:block hidden">
             <nav class="space-y-1">
-                <a href="posts-list.html" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-white bg-white/5">
+                <a href="{{ route('admin.posts.index') }}" class="flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-white bg-white/5">
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
                         <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>

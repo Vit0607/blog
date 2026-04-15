@@ -11,7 +11,7 @@ class Post extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['title', 'slug', 'excerpt', 'body', 'is_published', 'published_at', 'user_id'];
+    protected $fillable = ['title', 'image', 'slug', 'excerpt', 'body', 'is_published', 'published_at', 'user_id'];
 
     protected $casts = [
         'is_published' => 'boolean',
@@ -21,5 +21,10 @@ class Post extends Model
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
     }
 }
