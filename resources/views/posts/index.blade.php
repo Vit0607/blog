@@ -4,6 +4,18 @@
 
 
 @section('content')
+<form action="{{ route('blog.index') }}" method="GET" class="my-4 flex max-w-md items-center gap-2">
+    <input 
+        type="text" 
+        name="q" 
+        value="{{ request('q') }}" 
+        placeholder="Поиск по названию или тексту..." 
+        class="flex-1 rounded-lg border border-white/10 bg-gray-900/40 px-3 py-2 text-sm text-gray-200 placeholder-gray-500 focus:border-fuchsia-500/50 focus:outline-none">
+    <button type="submit" class="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/10 px-3 py-2 text-sm text-fuchsia-300 transition hover:bg-fuchsia-500/20 hover:text-white">
+        Найти
+    </button>
+</form>
+
 <div class="grid grid-cols-2 gap-4">
     @foreach($posts as $post)
     <article class="group relative overflow-hidden rounded-2xl border border-white/10 bg-gray-900/50 p-5 shadow transition hover:-translate-y-1 hover:shadow-lg hover:shadow-fuchsia-500/10">
