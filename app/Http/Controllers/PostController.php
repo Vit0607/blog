@@ -3,34 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Repositories\Interfaces\PostRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PostController extends Controller
 {
+    public function __construct(
+        private PostRepositoryInterface $posts
+    ) {}
+
     public function index(Request $request): View
     {
-        $query = Post::query()->where('is_published', true);
-
-        if ($search = trim((string)$request->input('q'))) {
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('body', 'like', "%{$search}%");
-            });
-        }
-
-        $posts = $query->orderByDesc('published_at')
-            ->orderByDesc('created_at')
-            ->paginate(4)
-            ->withQueryString();
-
+        
+        $posts = $this->posts->getPublishedPaginated($request->input('q'), 4);
         return view('posts.index', compact('posts'));
     }
 
-    public function show(Post $post): View
+    public function show(string $slug): View
     {
-        abort_unless($post->is_published, 404);
-
+        $post = $this->posts->findPublishedBySlugOrFail($slug);
         return view('posts.show', compact('post'));
     }
 }
