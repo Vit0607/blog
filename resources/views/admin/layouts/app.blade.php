@@ -60,7 +60,10 @@
             </div>
             <div class="flex items-center gap-3">
                 <span class="hidden sm:inline text-sm text-gray-400">Привет, Admin</span>
-                <button class="btn btn-outline">Выйти</button>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button>Выйти</button>
+                </form>
             </div>
         </div>
     </header>
