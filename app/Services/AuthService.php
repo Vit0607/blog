@@ -16,11 +16,15 @@ class AuthService implements AuthServiceInterface
 
     public function register(array $data): User
     {
-        return $this->users->create([
+        $user = $this->users->create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => $data['password']
-        ]);
+            ]);
+        
+        $user->sendEmailVerificationNotification();
+
+        return $user;
     }
 
     public function attemptLogin(string $email, string $password, bool $remember = false): bool
