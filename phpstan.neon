@@ -1,0 +1,14 @@
+includes:
+    - ./vendor/larastan/larastan/extension.neon
+
+parameters:
+
+    paths:
+        - app/
+
+    # Уровень строгости анализа (от 0 до 9). 5 — идеальный баланс для старта.
+    level: 5
+
+    # Если вы используете специфичные аннотации типов, можно отключить строгую проверку некоторых миксинов
+    # ignoreErrors:
+    #     - '#Extension error#'

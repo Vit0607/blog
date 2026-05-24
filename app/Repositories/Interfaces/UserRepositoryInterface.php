@@ -8,6 +8,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface UserRepositoryInterface
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function create(array $data): User;
 
     public function findByEmail(string $email): ?User;

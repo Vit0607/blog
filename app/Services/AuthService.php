@@ -35,7 +35,7 @@ class AuthService implements AuthServiceInterface
     public function logout(): void
     {
         Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        session()->invalidate();
+        session()->regenerateToken();
     }
 }

@@ -11,7 +11,7 @@ class UserRepository implements UserRepositoryInterface
 {
     public function create(array $data): User
     {
-        return User::create($data);
+        return User::query()->create($data);
     }
 
     public function findByEmail(string $email): ?User
@@ -21,7 +21,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function updateRole(int $id, UserRole $role): bool
     {
-        return User::where('id', $id)->update([
+        return (bool) User::where('id', $id)->update([
             'role' => $role->value
         ]);
     }
