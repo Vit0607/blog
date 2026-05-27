@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Http\Resources\PostCollection;
+use App\Http\Resources\PostResource;
 use App\Services\Interfaces\PostServiceInterface;
 use Illuminate\Http\JsonResponse;
 
@@ -14,40 +16,43 @@ class PostController extends Controller
         private PostServiceInterface $postService
     ){}
 
-    public function index(): JsonResponse
+    public function index(): PostCollection
     {
-        return response()->json($this->postService->getAllApi());
+        $posts = $this->postService->getAllApi();
 
+        return new PostCollection($posts);
     }
 
-    public function show(int $id): JsonResponse
+    public function show(int $id): JsonResponse | PostResource
     {
         $post = $this->postService->getByIdApi($id);
 
         if (!$post) {
-            return response()->json(['message', 'Not found'], 404);
+            return response()->json(['message' => 'Not found'], 404);
         }
 
-        return response()->json($post);
+        return new PostResource($post);
     }
 
-    public function store(StorePostRequest $request): JsonResponse
+    public function store(StorePostRequest $request): PostResource
     {
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
         
-        return response()->json($this->postService->createApi($data), 201);
+        $post = $this->postService->createApi($data);
+
+        return new PostResource($post);
     }
 
-    public function update(UpdatePostRequest $request, int $id): JsonResponse
+    public function update(UpdatePostRequest $request, int $id): JsonResponse | PostResource
     {
         $post = $this->postService->updateApi($id, $request->validated());
 
         if (!$post) {
-            return response()->json(['message', 'Not found'], 404);
+            return response()->json(['message' => 'Not found'], 404);
         }
 
-        return response()->json($post);
+        return new PostResource($post);
     }
 
     public function destroy(int $id): JsonResponse
@@ -55,7 +60,7 @@ class PostController extends Controller
         $deleted = $this->postService->deleteApi($id);
 
         if (!$deleted) {
-            return response()->json(['message' => 'Not found']);
+            return response()->json(['message' => 'Not found'], 404);
         }
 
         return response()->json(['message' => 'Deleted']);
