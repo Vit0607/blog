@@ -9,6 +9,7 @@ use App\Http\Resources\PostCollection;
 use App\Http\Resources\PostResource;
 use App\Services\Interfaces\PostServiceInterface;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -46,6 +47,10 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, int $id): JsonResponse | PostResource
     {
+        $post = $this->postService->getByIdApi($id);
+
+        Gate::authorize('update', $post);
+
         $post = $this->postService->updateApi($id, $request->validated());
 
         if (!$post) {
@@ -57,6 +62,10 @@ class PostController extends Controller
 
     public function destroy(int $id): JsonResponse
     {
+        $post = $this->postService->getByIdApi($id);
+
+        Gate::authorize('delete', $post);
+    
         $deleted = $this->postService->deleteApi($id);
 
         if (!$deleted) {
