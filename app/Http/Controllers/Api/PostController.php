@@ -15,7 +15,7 @@ class PostController extends Controller
 {
     public function __construct(
         private PostServiceInterface $postService
-    ){}
+    ) {}
 
     public function index(): PostCollection
     {
@@ -24,11 +24,18 @@ class PostController extends Controller
         return new PostCollection($posts);
     }
 
-    public function show(int $id): JsonResponse | PostResource
+    public function trashed(): PostCollection
+    {
+        $posts = $this->postService->getTrashed();
+
+        return new PostCollection($posts);
+    }
+
+    public function show(int $id): JsonResponse|PostResource
     {
         $post = $this->postService->getByIdApi($id);
 
-        if (!$post) {
+        if (! $post) {
             return response()->json(['message' => 'Not found'], 404);
         }
 
@@ -39,21 +46,25 @@ class PostController extends Controller
     {
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
-        
+
         $post = $this->postService->createApi($data);
 
         return new PostResource($post);
     }
 
-    public function update(UpdatePostRequest $request, int $id): JsonResponse | PostResource
+    public function update(UpdatePostRequest $request, int $id): JsonResponse|PostResource
     {
         $post = $this->postService->getByIdApi($id);
+
+        if (! $post) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
 
         Gate::authorize('update', $post);
 
         $post = $this->postService->updateApi($id, $request->validated());
 
-        if (!$post) {
+        if (! $post) {
             return response()->json(['message' => 'Not found'], 404);
         }
 
@@ -65,13 +76,35 @@ class PostController extends Controller
         $post = $this->postService->getByIdApi($id);
 
         Gate::authorize('delete', $post);
-    
-        $deleted = $this->postService->deleteApi($id);
 
-        if (!$deleted) {
+        $deleted = $this->postService->softDeleteApi($id);
+
+        if (! $deleted) {
             return response()->json(['message' => 'Not found'], 404);
         }
 
         return response()->json(['message' => 'Deleted']);
+    }
+
+    public function restore(int $id): JsonResponse
+    {
+        $result = $this->postService->restoreApi($id);
+
+        if (! $result) {
+            return response()->json(['success' => false, 'message' => 'Not Found'], 404);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function forceDelete(int $id): JsonResponse
+    {
+        $deleted = $this->postService->forceDeleteApi($id);
+
+        if (! $deleted) {
+            return response()->json(['success' => false, 'message' => 'Not Found'], 404);
+        }
+
+        return response()->json(['success' => true]);
     }
 }

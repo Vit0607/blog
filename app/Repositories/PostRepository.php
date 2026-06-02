@@ -13,7 +13,7 @@ class PostRepository implements PostRepositoryInterface
     {
         $query = Post::query()->where('is_published', true);
 
-        if ($search = trim((string)$search)) {
+        if ($search = trim((string) $search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                     ->orWhere('body', 'like', "%{$search}%");
@@ -60,9 +60,35 @@ class PostRepository implements PostRepositoryInterface
         return $post;
     }
 
-    public function deleteApi(Post $post): bool
+    public function softDelete(Post $post): bool
     {
         return $post->delete();
     }
 
+    public function restore(int $id): ?Post
+    {
+        $post = Post::onlyTrashed()->find($id);
+        if (! $post) {
+            return null;
+        }
+
+        $post->restore();
+
+        return $post;
+    }
+
+    public function forceDelete(int $id): bool
+    {
+        $post = Post::find($id);
+        if (! $post) {
+            return false;
+        }
+
+        return $post->forceDelete();
+    }
+
+    public function getTrashed(): Collection
+    {
+        return Post::onlyTrashed()->get();
+    }
 }
