@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\ApiException;
 use App\Models\Post;
 use App\Repositories\Interfaces\PostRepositoryInterface;
 use App\Services\Interfaces\PostServiceInterface;
@@ -143,7 +144,13 @@ class PostService implements PostServiceInterface
     public function getByIdApi(int $id): ?Post
     {
         return Cache::remember("posts_{$id}", 60, function () use ($id) {
-            return $this->postRepository->findApi($id);
+            $post = $this->postRepository->findApi($id);
+
+            if (! $post) {
+                throw new ApiException("Post with ID $id not found", 404);
+            }
+
+            return $post;
         });
     }
 
