@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Repositories\Interfaces\PostRepositoryInterface;
 use App\Services\Interfaces\PostServiceInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -39,6 +40,11 @@ class PostService implements PostServiceInterface
                 $data['published_at'] = $isPublished ? now() : null;
 
                 $post = Post::create($data);
+
+                Log::info('Post created', [
+                    'post_id' => $post->id,
+                    'user_id' => Auth::id(),
+                ]);
 
                 Cache::forget('posts_all');
                 Cache::forget("posts_{$post->id}");
@@ -89,6 +95,11 @@ class PostService implements PostServiceInterface
 
                 $post->update($data);
 
+                Log::info('Post updated', [
+                    'post_id' => $post->id,
+                    'user_id' => Auth::id(),
+                ]);
+
                 Cache::forget('posts_all');
                 Cache::forget("posts_{$post->id}");
 
@@ -116,6 +127,11 @@ class PostService implements PostServiceInterface
 
         DB::transaction(function () use ($post, $image, $postId) {
             $post->delete();
+
+            Log::info('Post deleted', [
+                'post_id' => $postId,
+                'user_id' => Auth::id(),
+            ]);
 
             Cache::forget('posts_all');
             Cache::forget("posts_{$postId}");
@@ -194,6 +210,11 @@ class PostService implements PostServiceInterface
 
         $updatedPost = $this->postRepository->updateApi($post, $data);
 
+        Log::info('Post updated', [
+            'post_id' => $id,
+            'user_id' => Auth::id(),
+        ]);
+
         Cache::forget('posts_all');
         Cache::forget("posts_{$id}");
 
@@ -208,12 +229,19 @@ class PostService implements PostServiceInterface
             return false;
         }
 
-        $deletedPost = $this->postRepository->softDelete($post);
+        $deleted = $this->postRepository->softDelete($post);
+
+        if ($deleted) {
+            Log::info('Post soft deleted', [
+                'post_id' => $id,
+                'user_id' => Auth::id(),
+            ]);
+        }
 
         Cache::forget('posts_all');
         Cache::forget("posts_{$id}");
 
-        return $deletedPost;
+        return $deleted;
     }
 
     public function restoreApi(int $id): ?Post
@@ -222,6 +250,11 @@ class PostService implements PostServiceInterface
         if (! $post) {
             return null;
         }
+
+        Log::info('Post restored', [
+            'post_id' => $id,
+            'user_id' => Auth::id(),
+        ]);
 
         Cache::forget('posts_all');
         Cache::forget("posts_{$id}");
@@ -235,6 +268,11 @@ class PostService implements PostServiceInterface
         if (! $deleted) {
             return false;
         }
+
+        Log::info('Post permanently deleted', [
+            'post_id' => $id,
+            'user_id' => Auth::id(),
+        ]);
 
         Cache::forget('posts_all');
         Cache::forget("posts_{$id}");

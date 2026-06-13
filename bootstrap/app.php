@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -47,6 +49,13 @@ return Application::configure(basePath: dirname(__DIR__))
             ]);
 
             return true;
+        });
+
+        $exceptions->render(function (ThrottleRequestsException $e): JsonResponse {
+            return response()->json([
+                'success' => false,
+                'message' => 'Too many requests. Please try again later.',
+            ], 429);
         });
 
         $exceptions->render(function (ApiException $e) {
